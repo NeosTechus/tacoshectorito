@@ -125,8 +125,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if ((order.customerEmail || '').toLowerCase() !== String(customerEmail).toLowerCase()) {
         return res.status(403).json({ error: 'Email does not match order' });
       }
-      if (['completed', 'cancelled'].includes(order.status)) {
-        return res.status(400).json({ error: 'Order cannot be cancelled' });
+      if (order.status !== 'pending') {
+        return res.status(400).json({ error: 'Order cannot be cancelled after acceptance' });
       }
 
       const createdAt = new Date(order.createdAt as any).getTime();

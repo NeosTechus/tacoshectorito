@@ -127,7 +127,7 @@ const OrderSuccessPage = () => {
 
   const canCancel = (() => {
     if (!order || !sessionId) return false;
-    if (!['pending', 'received'].includes(order.status)) return false;
+    if (order.status !== 'pending') return false;
     const createdAt = new Date(order.createdAt).getTime();
     return Date.now() - createdAt <= 2 * 60 * 1000;
   })();
