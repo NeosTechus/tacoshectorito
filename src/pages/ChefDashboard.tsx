@@ -20,6 +20,7 @@ import {
   Phone
 } from 'lucide-react';
 import { useOrderNotifications } from '@/hooks/useOrderNotifications';
+import { API_BASE } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +33,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 
-const API_URL = import.meta.env.VITE_APP_URL || '';
+const API_URL = API_BASE;
 
 interface Order {
   _id: string;

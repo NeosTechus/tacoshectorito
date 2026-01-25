@@ -1,7 +1,7 @@
 // API utilities for connecting to Vercel serverless functions
 
-const API_BASE = import.meta.env.PROD 
-  ? '' // In production, API routes are at the same domain
+export const API_BASE = import.meta.env.PROD 
+  ? '' // In production (and Vercel previews), API routes are at the same domain
   : 'http://localhost:3000'; // Local development with vercel dev
 
 // Auth API

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, Clock, ChefHat, Package, Truck } from 'lucide-react';
-import { ordersApi } from '@/lib/api';
+import { API_BASE, ordersApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/Navbar';
@@ -123,7 +123,7 @@ const OrderSuccessPage = () => {
     if (!sessionId || !order?.customerEmail) return;
     setCanceling(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_APP_URL}/api/orders`, {
+      const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

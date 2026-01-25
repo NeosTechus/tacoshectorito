@@ -7,11 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE } from '@/lib/api';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-const API_URL = import.meta.env.VITE_APP_URL || '';
+const API_URL = API_BASE;
 const HAS_STRIPE_KEYS = Boolean(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface CheckoutModalProps {
