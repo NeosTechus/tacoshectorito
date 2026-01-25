@@ -52,9 +52,16 @@ const OrderSuccessPage = () => {
       try {
         const result = await ordersApi.getBySessionId(sessionId);
         if (result.orders && result.orders.length > 0) {
-          setOrder(result.orders[0]);
-          const readyAt = new Date(result.orders[0].estimatedReadyAt).getTime();
-          setTimeLeft(Math.max(0, readyAt - Date.now()));
+          const latestOrder = result.orders[0];
+          setOrder(latestOrder);
+          if (latestOrder.status === 'cancelled') {
+            setTimeLeft(0);
+          } else if (latestOrder.estimatedReadyAt) {
+            const readyAt = new Date(latestOrder.estimatedReadyAt).getTime();
+            setTimeLeft(Math.max(0, readyAt - Date.now()));
+          } else {
+            setTimeLeft(0);
+          }
           foundOrder = true;
         }
       } catch (error) {
@@ -67,8 +74,14 @@ const OrderSuccessPage = () => {
         if (testOrderData) {
           const testOrder = JSON.parse(testOrderData);
           setOrder(testOrder);
-          const readyAt = new Date(testOrder.estimatedReadyAt).getTime();
-          setTimeLeft(Math.max(0, readyAt - Date.now()));
+          if (testOrder.status === 'cancelled') {
+            setTimeLeft(0);
+          } else if (testOrder.estimatedReadyAt) {
+            const readyAt = new Date(testOrder.estimatedReadyAt).getTime();
+            setTimeLeft(Math.max(0, readyAt - Date.now()));
+          } else {
+            setTimeLeft(0);
+          }
         }
       }
 
@@ -84,14 +97,14 @@ const OrderSuccessPage = () => {
 
   // Countdown timer
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0 || order?.status === 'cancelled') return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1000));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, order?.status]);
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -137,6 +150,7 @@ const OrderSuccessPage = () => {
         throw new Error(data.error || 'Cancel failed');
       }
       setOrder({ ...order, status: 'cancelled' });
+      setTimeLeft(0);
       toast.success('Order cancelled and refunded');
     } catch (error: any) {
       toast.error(error.message || 'Failed to cancel order');
@@ -239,7 +253,7 @@ const OrderSuccessPage = () => {
               )}
 
               {/* Timer - only show when order is accepted and has estimated time */}
-              {timeLeft > 0 && order.status !== 'pending' && (
+              {timeLeft > 0 && order.status !== 'pending' && order.status !== 'cancelled' && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
