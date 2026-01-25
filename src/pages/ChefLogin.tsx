@@ -8,8 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-const API_URL = import.meta.env.VITE_APP_URL || '';
-
 const ChefLogin = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -27,7 +25,7 @@ const ChefLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth`, {
+      const response = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'chef-login', password }),

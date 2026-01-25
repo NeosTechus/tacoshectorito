@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-const API_URL = import.meta.env.VITE_APP_URL || '';
-
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -25,7 +23,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth`, {
+      const response = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'admin-login', password }),

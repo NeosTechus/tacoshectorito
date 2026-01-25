@@ -393,7 +393,7 @@ const ChefDashboard = () => {
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Stats Bar */}
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           <Card className="bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800">
             <CardContent className="p-4 text-center">
               <div className="text-3xl font-bold text-amber-600">{pendingOrders.length}</div>
