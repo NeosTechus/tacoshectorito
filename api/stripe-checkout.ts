@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getRequestContext, logError } from './logger';
+import { getRequestContext, logError } from './logger.js';
 
 const getStripeClient = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY;

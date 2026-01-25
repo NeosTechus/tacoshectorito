@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { MongoClient, ObjectId, type Collection, type Document } from 'mongodb';
 import Stripe from 'stripe';
 import jwt from 'jsonwebtoken';
-import { getRequestContext, logError } from './logger';
+import { getRequestContext, logError } from './logger.js';
 
 let cachedClient: MongoClient | null = null;
 let ordersIndexesReady = false;

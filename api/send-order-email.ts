@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Resend } from 'resend';
-import { getRequestContext, logError, logInfo, logWarn } from './logger';
+import { getRequestContext, logError, logInfo, logWarn } from './logger.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
