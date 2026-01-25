@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { MongoClient, type Collection, type Document } from 'mongodb';
-import { getRequestContext, logError, logInfo, logWarn } from './logger.ts';
+import { getRequestContext, logError, logInfo, logWarn } from './logger';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
