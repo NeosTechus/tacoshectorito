@@ -541,7 +541,7 @@ const ChefDashboard = () => {
           </Card>
         </div>
 
-        {/* Completed and Rejected Orders */}
+        {/* Completed and Cancelled Orders */}
         <div className="space-y-6">
           {/* Completed Orders Section */}
           <Card className="bg-card">
@@ -578,12 +578,12 @@ const ChefDashboard = () => {
             )}
           </Card>
 
-          {/* Rejected Orders Section */}
+          {/* Cancelled & Refunded Orders Section */}
           <Card className="bg-card">
             <CardHeader className="pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <XIcon className="w-5 h-5 text-red-500" />
-                <CardTitle className="text-lg">Rejected Orders ({cancelledOrders.length})</CardTitle>
+                <CardTitle className="text-lg">Cancelled & Refunded ({cancelledOrders.length})</CardTitle>
               </div>
               <Button
                 variant="ghost"
@@ -596,7 +596,7 @@ const ChefDashboard = () => {
             {showRejected && (
               <CardContent className="p-3 space-y-3 max-h-[600px] overflow-y-auto">
                 {cancelledOrders.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No rejected orders</p>
+                  <p className="text-center text-muted-foreground py-8">No cancelled or refunded orders</p>
                 ) : (
                   cancelledOrders.map((order) => (
                     <OrderCard 
