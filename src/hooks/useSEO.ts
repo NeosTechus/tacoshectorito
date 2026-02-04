@@ -9,8 +9,8 @@ interface SEOProps {
 }
 
 const defaultSEO = {
-  title: 'El Torito - Authentic Mexican Restaurant | St. Louis, MO',
-  description: 'El Torito offers authentic Mexican cuisine on Cherokee Street, St. Louis. Enjoy tacos, burritos, quesadillas and more traditional Mexican dishes.',
+  title: 'Taqueria Hectorito - Authentic Mexican Restaurant | St. Louis, MO',
+  description: 'Taqueria Hectorito offers authentic Mexican tacos on Cherokee Street, St. Louis. Enjoy tacos, burritos, quesadillas and more traditional Mexican dishes.',
   ogImage: '/og-image.jpg',
   ogType: 'website',
 };
@@ -25,7 +25,7 @@ export const useSEO = ({
   useEffect(() => {
     // Update title
     const fullTitle = title 
-      ? `${title} | El Torito Mexican Restaurant`
+      ? `${title} | Taqueria Hectorito Mexican Restaurant`
       : defaultSEO.title;
     document.title = fullTitle;
 

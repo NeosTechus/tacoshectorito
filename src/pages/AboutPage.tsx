@@ -23,7 +23,7 @@ const AboutPageContent = () => {
 
   useSEO({
     title: 'About Us - Our Story & Values',
-    description: 'Learn about El Torito\'s journey bringing authentic Mexican flavors to Cherokee Street, St. Louis since day one. Family recipes, fresh ingredients, community spirit.',
+    description: 'Learn about Taqueria Hectorito\'s journey bringing authentic Mexican flavors to Cherokee Street, St. Louis since 2006. Family recipes, fresh ingredients, community spirit.',
     canonical: 'https://eltoritostl.com/about',
   });
 
@@ -59,7 +59,7 @@ const AboutPageContent = () => {
         <div className="absolute inset-0">
           <img 
             src={heroImg} 
-            alt="El Torito Restaurant" 
+            alt="Taqueria Hectorito Restaurant" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background" />
@@ -133,12 +133,12 @@ const AboutPageContent = () => {
               <div className="aspect-square rounded-3xl overflow-hidden shadow-xl">
                 <img 
                   src={heroImg} 
-                  alt="El Torito Interior" 
+                  alt="Taqueria Hectorito Interior" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="absolute -bottom-8 -left-8 bg-primary text-primary-foreground p-6 rounded-2xl shadow-lg">
-                <p className="font-display text-4xl font-bold">Est.</p>
+                <p className="font-display text-4xl font-bold">Est. 2006</p>
                 <p className="text-lg opacity-90">Cherokee St.</p>
               </div>
             </motion.div>

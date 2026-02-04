@@ -1,4 +1,4 @@
-# Deployment Guide - El Torito Restaurant
+# Deployment Guide - Taqueria Hectorito Restaurant
 
 This guide covers everything you need to deploy this restaurant ordering app to Vercel with all features working.
 

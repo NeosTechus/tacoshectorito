@@ -18,7 +18,7 @@ const ContactPageContent = () => {
 
   useSEO({
     title: 'Contact Us - Location & Hours',
-    description: 'Visit El Torito at 2753 Cherokee St, St. Louis, MO 63118. Call (314) 771-8648. Open daily for lunch and dinner. Get directions and contact us.',
+    description: 'Visit Taqueria Hectorito at 2753 Cherokee St, St. Louis, MO 63118. Call (314) 771-8648. Open daily for lunch and dinner. Get directions and contact us.',
     canonical: 'https://eltoritostl.com/contact',
   });
 
@@ -235,7 +235,7 @@ const ContactPageContent = () => {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="El Torito Location"
+                    title="Taqueria Hectorito Location"
                   />
                 </div>
                 <div className="p-6">

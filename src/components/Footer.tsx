@@ -53,7 +53,7 @@ const Footer = () => {
                   <circle cx="35" cy="55" r="8" fill="hsl(35 30% 95%)" />
                 </svg>
               </div>
-              <span className="font-display text-2xl font-bold">El Torito</span>
+              <span className="font-display text-2xl font-bold">Taqueria Hectorito</span>
             </div>
             <p className="text-warm-cream/70 mb-6">
               {t('footer.description')}
@@ -154,9 +154,21 @@ const Footer = () => {
         <div className="border-t border-warm-cream/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-warm-cream/50 text-sm">
-              © {currentYear} El Torito Restaurante. {t('footer.rights')}
+              © {currentYear} Taqueria Hectorito Restaurante. {t('footer.rights')}
             </p>
             <div className="flex items-center gap-4">
+              <Link
+                to="/privacy-policy"
+                className="text-warm-cream/50 hover:text-warm-cream/70 text-sm transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/terms-of-service"
+                className="text-warm-cream/50 hover:text-warm-cream/70 text-sm transition-colors"
+              >
+                Terms of Service
+              </Link>
               <Link
                 to="/admin/login"
                 className="text-warm-cream/30 hover:text-warm-cream/50 text-xs transition-colors"

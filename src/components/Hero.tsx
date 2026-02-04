@@ -14,7 +14,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <img
           src={heroBg}
-          alt="Authentic Mexican cuisine"
+          alt="Authentic Mexican tacos"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-warm-brown/90 via-warm-brown/70 to-transparent" />
@@ -57,7 +57,7 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-warm-cream mb-6 leading-tight"
           >
-            El Torito
+            Taqueria Hectorito
           </motion.h1>
 
           <motion.p

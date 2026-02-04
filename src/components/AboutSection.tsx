@@ -20,13 +20,13 @@ const AboutSection = () => {
               A Taste of Mexico on Cherokee Street
             </h2>
             <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-              El Torito is more than just a restaurant – it's a family tradition 
+              Taqueria Hectorito is more than just a restaurant – it's a family tradition 
               bringing authentic Mexican flavors to St. Louis. Our menu features classic dishes 
               made with recipes passed down through generations, using the freshest ingredients.
             </p>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
               Whether you're craving our famous tacos or just want to experience 
-              the warmth of Mexican hospitality, El Torito welcomes you with open arms.
+              the warmth of Mexican hospitality, Taqueria Hectorito welcomes you with open arms.
             </p>
 
             {/* Rating */}
@@ -133,7 +133,7 @@ const AboutSection = () => {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="El Torito Location"
+                title="Taqueria Hectorito Location"
               />
             </div>
           </motion.div>

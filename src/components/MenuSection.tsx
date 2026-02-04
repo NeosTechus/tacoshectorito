@@ -12,8 +12,6 @@ import burritoImg from '@/assets/food-burrito.jpg';
 import drinkWaterImg from '@/assets/drink-water.jpg';
 import drinkCocaImg from '@/assets/drink-coca.jpg';
 import drinkJarritosImg from '@/assets/drink-jarritos.jpg';
-import drinkAguaChicaImg from '@/assets/drink-agua-chica.jpg';
-import drinkAguaGrandeImg from '@/assets/drink-agua-grande.jpg';
 
 
 const menuItems = [
@@ -46,7 +44,7 @@ const menuItems = [
   },
   {
     id: 'quesadilla-huasteca',
-    name: 'Quesadilla Huasteca',
+    name: 'Quesadilla Wuasteca',
     description: 'A traditional Huasteca-style quesadilla with your choice of meat, melted cheese, and fresh toppings.',
     price: 11,
     image: quesadillaImg,
@@ -386,8 +384,6 @@ const MenuSection = () => {
               { name: 'Water Bottle 16oz', price: 3, image: drinkWaterImg },
               { name: 'Coca medio Litro', price: 4, image: drinkCocaImg },
               { name: 'Jarritos', price: 3, image: drinkJarritosImg },
-              { name: 'Aguas Frescas Chica 16oz', price: 3, image: drinkAguaChicaImg },
-              { name: 'Aguas Frescas Grande 32oz', price: 5, image: drinkAguaGrandeImg },
             ].map((drink) => {
               const quantity = getDrinkQuantity(drink.name);
               const isSelected = selectedDrink === drink.name;

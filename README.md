@@ -1,4 +1,4 @@
-# El Torito Restaurant Ordering App
+# Taqueria Hectorito Restaurant Ordering App
 
 Full-stack restaurant ordering app built with Vite, React, and TypeScript.
 

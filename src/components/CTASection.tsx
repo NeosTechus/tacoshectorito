@@ -14,7 +14,7 @@ const CTASection = () => {
       <div className="absolute inset-0">
         <img
           src={heroBg}
-          alt="El Torito ambiance"
+          alt="Taqueria Hectorito ambiance"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-warm-brown/90" />

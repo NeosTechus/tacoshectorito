@@ -110,11 +110,11 @@ const Navbar = ({ onCartClick }: NavbarProps) => {
                 className="flex items-center gap-3"
               >
                 <div className="relative w-12 h-12 flex items-center justify-center">
-                  <img src="/header_logo.jpg" alt="El Torito Logo" className="w-full h-full" />
+                  <img src="/header_logo.jpg" alt="Taqueria Hectorito Logo" className="w-full h-full" />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-display text-2xl font-bold text-foreground leading-tight">
-                    El Torito
+                    Taqueria Hectorito
                   </span>
                   <span className="text-xs text-muted-foreground tracking-wider uppercase">
                     {t('nav.tagline')}
