@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
-import quesadillaImg from '@/assets/food-quesadilla.jpg';
+import quesadillaImg from '@/assets/quesadila.jpg';
+import quesadillaWuastecaImg from '@/assets/Quesadilla_wuasteca.JPG';
 import tortaImg from '@/assets/food-torta.jpg';
+import tortaDelChavoImg from '@/assets/food-Torta Del Chavo.JPG';
 import tacosImg from '@/assets/food-tacos.jpg';
 import burritoImg from '@/assets/food-burrito.jpg';
 import drinkWaterImg from '@/assets/drink-water.jpg';
@@ -38,7 +40,7 @@ const menuItems = [
     name: 'Torta Del Chavo',
     description: 'A large Mexican sandwich loaded with pork ham and pork cheese. Finished off with mayo, cheese, lettuce, tomato, onion, jalapeños, avocado.',
     price: 12,
-    image: tortaImg,
+    image: tortaDelChavoImg,
     isNew: true,
     isPopular: false,
   },
@@ -46,8 +48,8 @@ const menuItems = [
     id: 'quesadilla-huasteca',
     name: 'Quesadilla Wuasteca',
     description: 'A traditional Huasteca-style quesadilla with your choice of meat, melted cheese, and fresh toppings.',
-    price: 11,
-    image: quesadillaImg,
+    price: 6,
+    image: quesadillaWuastecaImg,
     isNew: true,
     isPopular: false,
   },
@@ -248,13 +250,13 @@ const MenuSection = () => {
                 <motion.img
                   src={item.image}
                   alt={item.name}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${item.id === 'tacos' ? 'object-[center_30%] scale-90' : ''}`}
                   animate={{
-                    scale: hoveredItem === item.id ? 1.1 : 1,
+                    scale: hoveredItem === item.id ? 1.1 : item.id === 'tacos' ? 0.9 : 1,
                   }}
                   transition={{ duration: 0.6 }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+                {/* gradient overlay removed to show original image */}
                 
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex gap-2">

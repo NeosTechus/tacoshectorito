@@ -11,7 +11,7 @@ import galleryInterior from '@/assets/gallery-interior.jpg';
 import galleryTacos from '@/assets/gallery-tacos-platter.jpg';
 import galleryKitchen from '@/assets/gallery-kitchen.jpg';
 import gallerySalsa from '@/assets/gallery-salsa.jpg';
-import foodQuesadilla from '@/assets/food-quesadilla.jpg';
+import foodQuesadilla from '@/assets/quesadila.jpg';
 import foodBurrito from '@/assets/food-burrito.jpg';
 import foodTorta from '@/assets/food-torta.jpg';
 import foodTacos from '@/assets/food-tacos.jpg';

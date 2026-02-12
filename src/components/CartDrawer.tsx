@@ -202,10 +202,16 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                       ${(totalPrice * 0.0875).toFixed(2)}
                     </span>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Processing Fee (2.9% + 30¢)</span>
+                    <span className="font-semibold text-foreground">
+                      ${((totalPrice * 1.0875) * 0.029 + 0.30).toFixed(2)}
+                    </span>
+                  </div>
                   <div className="flex justify-between items-center text-lg border-t border-border pt-4">
                     <span className="font-display font-bold text-foreground">Total</span>
                     <span className="font-display font-bold text-primary text-2xl">
-                      ${(totalPrice * 1.0875).toFixed(2)}
+                      ${(totalPrice * 1.0875 + (totalPrice * 1.0875) * 0.029 + 0.30).toFixed(2)}
                     </span>
                   </div>
                   

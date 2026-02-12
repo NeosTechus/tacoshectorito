@@ -108,7 +108,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
             customerName: formData.name.trim(),
             customerPhone: formData.phone.trim(),
             guestId,
-            totalAmount: totalPrice * 1.0875,
+            totalAmount: total,
           }),
         });
 
@@ -140,7 +140,7 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
           sauce: item.sauce || null,
           toppings: item.toppings || null,
         })),
-        totalAmount: totalPrice * 1.0875,
+        totalAmount: total,
         status: 'pending', // Payment received, awaiting admin approval
         prepTimeMinutes: 15,
         createdAt: new Date().toISOString(),
@@ -224,7 +224,8 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
   };
 
   const tax = totalPrice * 0.0875;
-  const total = totalPrice + tax;
+  const processingFee = (totalPrice + tax) * 0.029 + 0.30;
+  const total = totalPrice + tax + processingFee;
 
   return (
     <AnimatePresence>
@@ -287,6 +288,10 @@ const CheckoutModal = ({ isOpen, onClose }: CheckoutModalProps) => {
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Tax (8.75%)</span>
                       <span className="text-foreground">${tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Processing Fee (2.9% + 30¢)</span>
+                      <span className="text-foreground">${processingFee.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg pt-2">
                       <span className="text-foreground">Total</span>

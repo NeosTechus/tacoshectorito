@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import foodTacos from '@/assets/food-tacos.jpg';
 import foodBurrito from '@/assets/food-burrito.jpg';
-import foodQuesadilla from '@/assets/food-quesadilla.jpg';
+import foodQuesadilla from '@/assets/quesadila.jpg';
 import foodTorta from '@/assets/food-torta.jpg';
 
 const FeaturedSection = () => {
@@ -77,7 +77,7 @@ const FeaturedSection = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${item.name === t('featured.tacos') ? 'object-[center_30%] scale-90' : ''}`}
                 />
                 {item.popular && (
                   <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
