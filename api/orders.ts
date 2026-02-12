@@ -162,9 +162,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               status: 'cancelled',
               timestamp: new Date(),
               note: 'Customer cancelled within 2 minutes',
-            } as any,
+            },
           },
-        }
+        } as any
       );
 
       return res.status(200).json({ success: true, refundId });
@@ -265,12 +265,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Use $set and $push separately
+      const updateQuery: any = { $set: updateData };
+      if (status) {
+        updateQuery.$push = { statusHistory: { status, timestamp: new Date() } };
+      }
       const result = await ordersCollection.updateOne(
         { _id: new ObjectId(orderId) },
-        { 
-          $set: updateData,
-          ...(status && { $push: { statusHistory: { status, timestamp: new Date() } } })
-        }
+        updateQuery
       );
 
       if (result.matchedCount === 0) {
