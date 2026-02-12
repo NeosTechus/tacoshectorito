@@ -4,7 +4,7 @@ import { MongoClient, type Collection, type Document } from 'mongodb';
 import { getRequestContext, logError, logInfo, logWarn } from './logger.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
+  apiVersion: '2026-01-28.clover',
 });
 
 let cachedClient: MongoClient | null = null;
