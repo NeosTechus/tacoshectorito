@@ -7,7 +7,7 @@ const getStripeClient = () => {
   if (!secretKey) {
     throw new Error('Missing STRIPE_SECRET_KEY');
   }
-  return new Stripe(secretKey, { apiVersion: '2026-01-28.clover' });
+  return new Stripe(secretKey, { apiVersion: '2025-12-15.clover' });
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
