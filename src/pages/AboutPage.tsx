@@ -132,8 +132,8 @@ const AboutPageContent = () => {
             >
               <div className="aspect-square rounded-3xl overflow-hidden shadow-xl">
                 <img 
-                  src={heroImg} 
-                  alt="Taqueria Hectorito Interior" 
+                  src="/about.jpeg" 
+                  alt="Taqueria Hectorito Food" 
                   className="w-full h-full object-cover"
                 />
               </div>
