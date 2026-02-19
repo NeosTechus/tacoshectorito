@@ -93,8 +93,8 @@ const tacosToppingTypes = [
   'Cilantro', 'Onion', 'Cucumber', 'Radish', 'Lime', 'Cheese'
 ];
 
-const tortaToppingTypes = [
-  'Cilantro', 'Onion', 'Cucumber', 'Radish', 'Lime', 'Jalapeño', 'Avocado'
+const tortaExclusions = [
+  'No Mayo', 'No Cheese', 'No Onion', 'No Lettuce', 'No Jalapeño', 'No Tomato'
 ];
 
 const sauceTypes = [
@@ -103,6 +103,8 @@ const sauceTypes = [
 
 // Items that support topping selection
 const itemsWithToppings = ['quesadilla', 'quesadilla-huasteca', 'burrito', 'tacos', 'torta', 'torta-del-chavo'];
+
+const itemsWithoutMeat = ['torta-del-chavo'];
 
 const MenuSection = () => {
   const { addToCart } = useCart();
@@ -135,7 +137,8 @@ const MenuSection = () => {
   };
 
   const handleAddToCart = (item: typeof menuItems[0]) => {
-    const meat = selectedMeat[item.id] || 'Carne Asada';
+    const noMeat = itemsWithoutMeat.includes(item.id);
+    const meat = noMeat ? '' : (selectedMeat[item.id] || 'Carne Asada');
     const sauce = selectedSauce[item.id] || 'No Sauce';
     const toppings = selectedToppings[item.id] || [];
     const priceAdjustment = meat.includes('+$1') ? 1 : 0;
@@ -145,7 +148,7 @@ const MenuSection = () => {
       ? `${item.id}-${meat}-${sauce}-${toppings.sort().join('-')}`
       : `${item.id}-${meat}-${sauce}`;
     
-    const itemName = `${item.name} (${meat.replace(' (+$1)', '')})`;
+    const itemName = noMeat ? item.name : `${item.name} (${meat.replace(' (+$1)', '')})`;
     
     addToCart({
       id: itemId,
@@ -153,14 +156,16 @@ const MenuSection = () => {
       price: item.price + priceAdjustment,
       image: item.image,
       category: 'restaurant',
-      meatType: meat,
+      meatType: noMeat ? undefined : meat,
       sauce: sauce,
       toppings: itemsWithToppings.includes(item.id) ? toppings : undefined,
     });
 
-    const description = itemsWithToppings.includes(item.id)
-      ? `With ${meat.replace(' (+$1)', '')} • ${sauce} • ${toppingsStr}`
-      : `With ${meat.replace(' (+$1)', '')} • ${sauce}`;
+    const description = noMeat
+      ? (itemsWithToppings.includes(item.id) ? `${sauce} • ${toppingsStr}` : sauce)
+      : itemsWithToppings.includes(item.id)
+        ? `With ${meat.replace(' (+$1)', '')} • ${sauce} • ${toppingsStr}`
+        : `With ${meat.replace(' (+$1)', '')} • ${sauce}`;
 
     toast.success(`Added ${item.name} to cart!`, {
       description,
@@ -293,6 +298,7 @@ const MenuSection = () => {
                 </p>
 
                 {/* Meat selector */}
+                {!itemsWithoutMeat.includes(item.id) && (
                 <div className="mb-3">
                   <label className="text-sm font-medium text-foreground mb-2 block">
                     Choose your meat:
@@ -309,6 +315,7 @@ const MenuSection = () => {
                     ))}
                   </select>
                 </div>
+                )}
 
                 {/* Sauce selector */}
                 <div className="mb-3">
@@ -328,14 +335,14 @@ const MenuSection = () => {
                   </select>
                 </div>
 
-                {/* Toppings selector - only for quesadilla, burrito, tacos */}
+                {/* Toppings/exclusions selector */}
                 {itemsWithToppings.includes(item.id) && (
                   <div className="mb-4">
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Choose your toppings:
+                      {item.id === 'torta' || item.id === 'torta-del-chavo' ? 'Remove items:' : 'Choose your toppings:'}
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {(item.id === 'burrito' ? burritoToppingTypes : item.id === 'tacos' ? tacosToppingTypes : item.id === 'torta' ? tortaToppingTypes : toppingTypes).map((topping) => {
+                      {(item.id === 'torta' || item.id === 'torta-del-chavo' ? tortaExclusions : item.id === 'burrito' ? burritoToppingTypes : item.id === 'tacos' ? tacosToppingTypes : toppingTypes).map((topping) => {
                         const isSelected = (selectedToppings[item.id] || []).includes(topping);
                         return (
                           <button
