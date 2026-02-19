@@ -117,7 +117,7 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('admin_token');
       
       if (!token) {
-        navigate('/admin/login');
+        navigate('/login');
         return;
       }
 
@@ -135,14 +135,14 @@ const AdminDashboard = () => {
 
         if (!data.valid) {
           localStorage.removeItem('admin_token');
-          navigate('/admin/login');
+          navigate('/login');
           return;
         }
 
         setIsAuthenticated(true);
       } catch (error) {
         localStorage.removeItem('admin_token');
-        navigate('/admin/login');
+        navigate('/login');
       } finally {
         setAuthChecking(false);
       }
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     toast.success('Logged out successfully');
-    navigate('/admin/login');
+    navigate('/login');
   };
 
   const getAdminToken = () => localStorage.getItem('admin_token');

@@ -170,16 +170,10 @@ const Footer = () => {
                 Terms of Service
               </Link>
               <Link
-                to="/admin/login"
+                to="/login"
                 className="text-warm-cream/30 hover:text-warm-cream/50 text-xs transition-colors"
               >
-                Admin Login
-              </Link>
-              <Link
-                to="/chef/login"
-                className="text-warm-cream/30 hover:text-warm-cream/50 text-xs transition-colors"
-              >
-                Chef Login
+                Staff Login
               </Link>
               <a
                 href="https://www.neostechus.com"

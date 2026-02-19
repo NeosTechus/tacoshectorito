@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
@@ -13,9 +13,7 @@ import ContactPage from "./pages/ContactPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminLogin from "./pages/AdminLogin";
 import ChefDashboard from "./pages/ChefDashboard";
-import ChefLogin from "./pages/ChefLogin";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import AuthPage from "./pages/AuthPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -43,9 +41,9 @@ const App = () => (
                 <Route path="/orders" element={<OrderHistoryPage />} />
                 <Route path="/login" element={<AuthPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/login" element={<Navigate to="/login" replace />} />
                 <Route path="/chef" element={<ChefDashboard />} />
-                <Route path="/chef/login" element={<ChefLogin />} />
+                <Route path="/chef/login" element={<Navigate to="/login" replace />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/terms-of-service" element={<TermsOfServicePage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

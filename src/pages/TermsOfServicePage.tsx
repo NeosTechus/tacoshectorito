@@ -54,7 +54,7 @@ const TermsOfServicePage = () => {
                 <li>All orders are subject to acceptance by the restaurant</li>
                 <li>Prices are subject to change without notice</li>
                 <li>We reserve the right to refuse or cancel any order</li>
-                <li>Orders may be cancelled within 2 minutes of placement for a full refund</li>
+                <li>Orders may be cancelled within 30 seconds of placement for a refund (Stripe processing fees are deducted)</li>
                 <li>Estimated preparation times are approximate and may vary</li>
               </ul>
             </section>

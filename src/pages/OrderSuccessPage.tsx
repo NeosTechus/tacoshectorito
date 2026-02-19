@@ -129,7 +129,7 @@ const OrderSuccessPage = () => {
     if (!order || !sessionId) return false;
     if (order.status !== 'pending') return false;
     const createdAt = new Date(order.createdAt).getTime();
-    return Date.now() - createdAt <= 2 * 60 * 1000;
+    return Date.now() - createdAt <= 30 * 1000;
   })();
 
   const handleCancelOrder = async () => {
@@ -247,7 +247,7 @@ const OrderSuccessPage = () => {
                   className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-6 mb-8"
                 >
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    Your order has been cancelled. If you have questions, contact the restaurant.
+                    Your order has been cancelled. If you have questions, call us at <a href="tel:+13147718648" className="font-semibold underline">(314) 771-8648</a>.
                   </p>
                 </motion.div>
               )}

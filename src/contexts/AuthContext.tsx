@@ -15,7 +15,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isGuest: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; type?: string }>;
   register: (data: { email: string; password: string; name?: string; phone?: string }) => Promise<{ success: boolean; error?: string }>;
   googleLogin: (credential: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -75,6 +75,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: result.error };
       }
 
+      // Staff logins (admin/chef) are handled differently - store their token
+      // and return the type so the caller can redirect appropriately
+      if (result.type === 'admin') {
+        localStorage.setItem('admin_token', result.token);
+        return { success: true, type: 'admin' };
+      }
+      if (result.type === 'chef') {
+        localStorage.setItem('chef_token', result.token);
+        return { success: true, type: 'chef' };
+      }
+
       setToken(result.token);
       setUser(result.user);
       setGuestId(null);
@@ -83,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(USER_KEY, JSON.stringify(result.user));
       localStorage.removeItem(GUEST_KEY);
 
-      return { success: true };
+      return { success: true, type: 'user' };
     } catch (error: any) {
       return { success: false, error: error.message || 'Login failed' };
     }

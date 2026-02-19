@@ -105,8 +105,16 @@ const AuthPageContent = () => {
     setLoading(false);
 
     if (result.success) {
-      toast.success('Welcome back!');
-      navigate('/orders');
+      if (result.type === 'admin') {
+        toast.success('Welcome, Admin!');
+        navigate('/admin');
+      } else if (result.type === 'chef') {
+        toast.success('Welcome, Chef!');
+        navigate('/chef');
+      } else {
+        toast.success('Welcome back!');
+        navigate('/orders');
+      }
     } else {
       toast.error(result.error || 'Login failed');
       setErrors({ email: result.error || 'Invalid credentials' });

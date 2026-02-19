@@ -18,6 +18,7 @@ interface OrderEmailRequest {
   orderId: string;
   items: OrderItem[];
   total: number;
+  receiptUrl?: string | null;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -41,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { customerEmail, customerName, orderId, items, total }: OrderEmailRequest = req.body;
+    const { customerEmail, customerName, orderId, items, total, receiptUrl }: OrderEmailRequest = req.body;
 
     // Send notification email to restaurant owner
     const ownerEmail = process.env.OWNER_EMAIL;
@@ -112,6 +113,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 </tfoot>
               </table>
               
+              ${receiptUrl ? `
+              <div style="text-align: center; margin-bottom: 20px;">
+                <a href="${receiptUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                  🧾 View Stripe Receipt
+                </a>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #9ca3af;">Payment confirmation &amp; detailed receipt from Stripe</p>
+              </div>
+              ` : ''}
+
               <div style="background: #fef3c7; padding: 16px; border-radius: 8px;">
                 <p style="margin: 0; color: #92400e; font-size: 14px;">
                   ⚡ <strong>Action needed:</strong> Please accept or review this order in the <a href="${process.env.VITE_APP_URL}/chef" style="color: #dc2626; font-weight: 600;">Chef Dashboard</a>

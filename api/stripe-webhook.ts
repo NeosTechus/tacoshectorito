@@ -130,15 +130,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         throw dbError;
       }
 
-      // Send confirmation email (non-blocking)
-      if (session.customer_email && process.env.RESEND_API_KEY) {
+      // Send order notification email to owner (non-blocking)
+      if (process.env.RESEND_API_KEY) {
         try {
+          // Retrieve the Stripe receipt URL from the charge
+          let receiptUrl: string | null = null;
+          const paymentIntentId = typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : session.payment_intent?.id;
+          if (paymentIntentId) {
+            try {
+              const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+              const chargeId = typeof paymentIntent.latest_charge === 'string'
+                ? paymentIntent.latest_charge
+                : paymentIntent.latest_charge?.id;
+              if (chargeId) {
+                const charge = await stripe.charges.retrieve(chargeId);
+                receiptUrl = charge.receipt_url || null;
+              }
+            } catch (receiptErr) {
+              logWarn('stripe_receipt_url_fetch_failed', { ...requestContext, paymentIntentId });
+            }
+          }
+
           const emailPayload = {
-            customerEmail: session.customer_email,
+            customerEmail: session.customer_email || 'Not provided',
             customerName: session.metadata?.customerName || 'Valued Customer',
             orderId: createdOrderId || session.id,
             items: parsedItems,
             total: totalAmount,
+            receiptUrl,
           };
 
           // Call the email endpoint

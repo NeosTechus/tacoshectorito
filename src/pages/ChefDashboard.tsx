@@ -103,7 +103,7 @@ const ChefDashboard = () => {
       const token = localStorage.getItem('chef_token');
       
       if (!token) {
-        navigate('/chef/login');
+        navigate('/login');
         return;
       }
 
@@ -121,14 +121,14 @@ const ChefDashboard = () => {
 
         if (!data.valid) {
           localStorage.removeItem('chef_token');
-          navigate('/chef/login');
+          navigate('/login');
           return;
         }
 
         setIsAuthenticated(true);
       } catch (error) {
         localStorage.removeItem('chef_token');
-        navigate('/chef/login');
+        navigate('/login');
       } finally {
         setAuthChecking(false);
       }
@@ -140,7 +140,7 @@ const ChefDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('chef_token');
     toast.success('Logged out successfully');
-    navigate('/chef/login');
+    navigate('/login');
   };
 
   const getChefToken = () => localStorage.getItem('chef_token');

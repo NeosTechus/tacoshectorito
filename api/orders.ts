@@ -111,7 +111,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ orders });
     }
 
-    // POST - Cancel order with auto-refund (within 2 minutes)
+    // POST - Cancel order with auto-refund (within 30 seconds)
     if (req.method === 'POST' && body?.action === 'cancel') {
       const { sessionId, customerEmail } = body;
       if (!sessionId || !customerEmail) {
@@ -130,22 +130,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const createdAt = new Date(order.createdAt as any).getTime();
-      const withinWindow = Date.now() - createdAt <= 2 * 60 * 1000;
+      const withinWindow = Date.now() - createdAt <= 30 * 1000;
       if (!withinWindow) {
         return res.status(400).json({ error: 'Cancellation window expired' });
       }
 
       let refundId: string | null = null;
-      if (typeof order.stripeSessionId === 'string' && order.stripeSessionId.startsWith('test_')) {
-        refundId = 'test_refund';
-      } else {
-        const paymentIntentId = order.paymentIntentId;
-        if (!paymentIntentId) {
-          return res.status(500).json({ error: 'Payment intent not found for refund' });
+      let refundAmount = 0;
+      let stripeFee = 0;
+      let originalCharge = 0;
+
+      try {
+        if (typeof order.stripeSessionId === 'string' && order.stripeSessionId.startsWith('test_')) {
+          refundId = 'test_refund';
+          refundAmount = order.totalAmount || 0;
+        } else {
+          const paymentIntentId = order.paymentIntentId;
+          if (!paymentIntentId) {
+            return res.status(500).json({ error: 'Payment intent not found for refund' });
+          }
+          const stripe = getStripeClient();
+
+          const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+          const chargeId = typeof paymentIntent.latest_charge === 'string'
+            ? paymentIntent.latest_charge
+            : (paymentIntent.latest_charge as any)?.id;
+
+          if (!chargeId) {
+            return res.status(500).json({ error: 'Could not find charge for refund' });
+          }
+
+          const charge = await stripe.charges.retrieve(chargeId, {
+            expand: ['balance_transaction'],
+          });
+
+          if (charge.refunded) {
+            return res.status(400).json({ error: 'This order has already been refunded' });
+          }
+
+          const balanceTxn = charge.balance_transaction as Stripe.BalanceTransaction;
+          originalCharge = charge.amount / 100;
+          stripeFee = (balanceTxn?.fee || 0) / 100;
+          const refundCents = charge.amount - (balanceTxn?.fee || 0);
+          refundAmount = refundCents / 100;
+
+          const refund = await stripe.refunds.create({
+            payment_intent: paymentIntentId,
+            amount: refundCents,
+          });
+          refundId = refund.id;
         }
-        const stripe = getStripeClient();
-        const refund = await stripe.refunds.create({ payment_intent: paymentIntentId });
-        refundId = refund.id;
+      } catch (refundError: any) {
+        logError('customer_cancel_refund_error', refundError, requestContext);
+        return res.status(500).json({ error: `Refund failed: ${refundError.message}. Order was not cancelled — please try again or call us at (314) 771-8648.` });
       }
 
       await ordersCollection.updateOne(
@@ -154,6 +191,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           $set: {
             status: 'cancelled',
             refundId,
+            refundAmount,
+            stripeFee,
+            originalCharge,
             refundedAt: new Date(),
             updatedAt: new Date(),
           },
@@ -161,13 +201,108 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             statusHistory: {
               status: 'cancelled',
               timestamp: new Date(),
-              note: 'Customer cancelled within 2 minutes',
+              note: `Customer cancelled within 30 seconds — $${refundAmount.toFixed(2)} refunded (Stripe fee $${stripeFee.toFixed(2)} deducted)`,
             },
           },
         } as any
       );
 
-      return res.status(200).json({ success: true, refundId });
+      // Send cancellation email to owner
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const ownerEmail = process.env.OWNER_EMAIL;
+          if (ownerEmail) {
+            const { Resend } = await import('resend');
+            const resend = new Resend(process.env.RESEND_API_KEY);
+
+            const itemsHtml = (order.items || []).map((item: any) => `
+              <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb;">
+                  ${item.name}${item.meatType ? ` <span style="color: #6b7280;">(${item.meatType})</span>` : ''}${item.sauce ? ` <span style="color: #6b7280;">with ${item.sauce}</span>` : ''}
+                </td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.qty || item.quantity || 1}</td>
+              </tr>
+            `).join('');
+
+            const orderId = order._id.toString();
+            const cancelHtml = `
+              <!DOCTYPE html>
+              <html>
+                <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f9fafb;">
+                  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                      <h1 style="color: white; margin: 0; font-size: 28px;">⚠️ Order Cancelled by Customer</h1>
+                    </div>
+                    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px;">
+                          <strong>Order #${orderId.slice(-8).toUpperCase()}</strong> &bull; Customer cancelled within 30 seconds of placing the order
+                        </p>
+                      </div>
+
+                      <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Customer Details</h3>
+                      <table style="width: 100%; margin-bottom: 24px; font-size: 14px;">
+                        <tr>
+                          <td style="padding: 6px 0; color: #6b7280; width: 100px;">Name:</td>
+                          <td style="padding: 6px 0; color: #111827; font-weight: 600;">${order.customerName || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; color: #6b7280;">Email:</td>
+                          <td style="padding: 6px 0; color: #111827;">${order.customerEmail || 'Not provided'}</td>
+                        </tr>
+                      </table>
+
+                      <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Cancelled Items</h3>
+                      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                        <thead>
+                          <tr style="background: #f3f4f6;">
+                            <th style="padding: 8px 12px; text-align: left; font-size: 13px; color: #6b7280;">Item</th>
+                            <th style="padding: 8px 12px; text-align: center; font-size: 13px; color: #6b7280;">Qty</th>
+                          </tr>
+                        </thead>
+                        <tbody>${itemsHtml}</tbody>
+                      </table>
+
+                      <div style="background: #fef2f2; padding: 16px; border-radius: 8px;">
+                        <h3 style="margin: 0 0 12px 0; color: #991b1b; font-size: 16px;">Refund Summary</h3>
+                        <table style="width: 100%; font-size: 14px;">
+                          <tr>
+                            <td style="padding: 4px 0; color: #6b7280;">Original Charge:</td>
+                            <td style="padding: 4px 0; text-align: right; color: #111827;">$${originalCharge.toFixed(2)}</td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 4px 0; color: #6b7280;">Stripe Fee (deducted):</td>
+                            <td style="padding: 4px 0; text-align: right; color: #dc2626;">-$${stripeFee.toFixed(2)}</td>
+                          </tr>
+                          <tr style="border-top: 2px solid #fca5a5;">
+                            <td style="padding: 8px 0 4px; font-weight: bold; color: #111827;">Refunded to Customer:</td>
+                            <td style="padding: 8px 0 4px; text-align: right; font-weight: bold; font-size: 18px; color: #16a34a;">$${refundAmount.toFixed(2)}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 24px;">
+                      Taqueria Hectorito • Order Cancellation Notice
+                    </p>
+                  </div>
+                </body>
+              </html>
+            `;
+
+            await resend.emails.send({
+              from: 'Taqueria Hectorito Orders <onboarding@resend.dev>',
+              to: [ownerEmail],
+              subject: `⚠️ Order #${orderId.slice(-8).toUpperCase()} Cancelled by Customer — $${refundAmount.toFixed(2)} Refunded`,
+              html: cancelHtml,
+            });
+          }
+        } catch (emailErr) {
+          logError('customer_cancel_email_error', emailErr, requestContext);
+        }
+      }
+
+      return res.status(200).json({ success: true, refundId, refundAmount, stripeFee });
     }
 
     // POST - Create a dev/test order (local development only)
@@ -257,6 +392,58 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           updateData.estimatedReadyAt = new Date(Date.now() + prepTime * 60 * 1000);
           updateData.prepTimeMinutes = prepTime;
         }
+
+        // Auto-refund the full Stripe charge amount (includes taxes) when staff cancels/rejects
+        if (status === 'cancelled' && currentOrder && !currentOrder.refundId) {
+          const paymentIntentId = currentOrder.paymentIntentId;
+          if (paymentIntentId) {
+            try {
+              if (typeof currentOrder.stripeSessionId === 'string' && currentOrder.stripeSessionId.startsWith('test_')) {
+                updateData.refundId = 'test_refund';
+                updateData.refundAmount = currentOrder.totalAmount || 0;
+                updateData.stripeFee = 0;
+              } else {
+                const stripe = getStripeClient();
+
+                const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+                const chargeId = typeof paymentIntent.latest_charge === 'string'
+                  ? paymentIntent.latest_charge
+                  : (paymentIntent.latest_charge as any)?.id;
+
+                if (!chargeId) {
+                  return res.status(500).json({ error: 'Could not find charge for refund' });
+                }
+
+                const charge = await stripe.charges.retrieve(chargeId, {
+                  expand: ['balance_transaction'],
+                });
+
+                if (charge.refunded) {
+                  return res.status(400).json({ error: 'This order has already been refunded' });
+                }
+
+                const balanceTxn = charge.balance_transaction as Stripe.BalanceTransaction;
+                const totalCharged = charge.amount;
+                const stripeFee = balanceTxn?.fee || 0;
+                const refundAmount = totalCharged - stripeFee;
+
+                const refund = await stripe.refunds.create({
+                  payment_intent: paymentIntentId,
+                  amount: refundAmount,
+                });
+
+                updateData.refundId = refund.id;
+                updateData.refundAmount = refundAmount / 100;
+                updateData.stripeFee = stripeFee / 100;
+                updateData.originalCharge = totalCharged / 100;
+              }
+              updateData.refundedAt = new Date();
+            } catch (refundError: any) {
+              logError('staff_refund_error', refundError, requestContext);
+              return res.status(500).json({ error: `Refund failed: ${refundError.message}. Order was not rejected — please try again or call (314) 771-8648.` });
+            }
+          }
+        }
       }
 
       if (prepTimeMinutes) {
@@ -267,7 +454,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Use $set and $push separately
       const updateQuery: any = { $set: updateData };
       if (status) {
-        updateQuery.$push = { statusHistory: { status, timestamp: new Date() } };
+        const note = status === 'cancelled' && updateData.refundId
+          ? `Rejected by staff — $${updateData.refundAmount?.toFixed(2)} refunded (Stripe fee $${updateData.stripeFee?.toFixed(2)} deducted)`
+          : undefined;
+        updateQuery.$push = { statusHistory: { status, timestamp: new Date(), ...(note && { note }) } };
       }
       const result = await ordersCollection.updateOne(
         { _id: new ObjectId(orderId) },
@@ -278,7 +468,109 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      return res.status(200).json({ success: true });
+      // Send cancellation/refund email to owner
+      if (status === 'cancelled' && updateData.refundId && process.env.RESEND_API_KEY) {
+        try {
+          const ownerEmail = process.env.OWNER_EMAIL;
+          if (ownerEmail) {
+            const { Resend } = await import('resend');
+            const resend = new Resend(process.env.RESEND_API_KEY);
+
+            const itemsHtml = (currentOrder?.items || []).map((item: any) => `
+              <tr>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb;">
+                  ${item.name}${item.meatType ? ` <span style="color: #6b7280;">(${item.meatType})</span>` : ''}${item.sauce ? ` <span style="color: #6b7280;">with ${item.sauce}</span>` : ''}
+                </td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.qty || item.quantity || 1}</td>
+              </tr>
+            `).join('');
+
+            const cancelHtml = `
+              <!DOCTYPE html>
+              <html>
+                <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f9fafb;">
+                  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                    <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                      <h1 style="color: white; margin: 0; font-size: 28px;">❌ Order Rejected &amp; Refunded</h1>
+                    </div>
+                    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                      <div style="background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 8px 8px 0;">
+                        <p style="margin: 0; color: #991b1b; font-size: 14px;">
+                          <strong>Order #${orderId.slice(-8).toUpperCase()}</strong> &bull; ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
+                        </p>
+                      </div>
+
+                      <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Customer Details</h3>
+                      <table style="width: 100%; margin-bottom: 24px; font-size: 14px;">
+                        <tr>
+                          <td style="padding: 6px 0; color: #6b7280; width: 100px;">Name:</td>
+                          <td style="padding: 6px 0; color: #111827; font-weight: 600;">${currentOrder?.customerName || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; color: #6b7280;">Email:</td>
+                          <td style="padding: 6px 0; color: #111827;">${currentOrder?.customerEmail || 'Not provided'}</td>
+                        </tr>
+                      </table>
+
+                      <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Order Items</h3>
+                      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                        <thead>
+                          <tr style="background: #f3f4f6;">
+                            <th style="padding: 8px 12px; text-align: left; font-size: 13px; color: #6b7280;">Item</th>
+                            <th style="padding: 8px 12px; text-align: center; font-size: 13px; color: #6b7280;">Qty</th>
+                          </tr>
+                        </thead>
+                        <tbody>${itemsHtml}</tbody>
+                      </table>
+
+                      <div style="background: #fef2f2; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                        <h3 style="margin: 0 0 12px 0; color: #991b1b; font-size: 16px;">Refund Summary</h3>
+                        <table style="width: 100%; font-size: 14px;">
+                          <tr>
+                            <td style="padding: 4px 0; color: #6b7280;">Original Charge:</td>
+                            <td style="padding: 4px 0; text-align: right; color: #111827;">$${(updateData.originalCharge || currentOrder?.totalAmount || 0).toFixed(2)}</td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 4px 0; color: #6b7280;">Stripe Fee (deducted):</td>
+                            <td style="padding: 4px 0; text-align: right; color: #dc2626;">-$${(updateData.stripeFee || 0).toFixed(2)}</td>
+                          </tr>
+                          <tr style="border-top: 2px solid #fca5a5;">
+                            <td style="padding: 8px 0 4px; font-weight: bold; color: #111827;">Refunded to Customer:</td>
+                            <td style="padding: 8px 0 4px; text-align: right; font-weight: bold; font-size: 18px; color: #16a34a;">$${(updateData.refundAmount || 0).toFixed(2)}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 24px;">
+                      Taqueria Hectorito • Order Cancellation Notice
+                    </p>
+                  </div>
+                </body>
+              </html>
+            `;
+
+            await resend.emails.send({
+              from: 'Taqueria Hectorito Orders <onboarding@resend.dev>',
+              to: [ownerEmail],
+              subject: `❌ Order #${orderId.slice(-8).toUpperCase()} Rejected — $${(updateData.refundAmount || 0).toFixed(2)} Refunded`,
+              html: cancelHtml,
+            });
+          }
+        } catch (emailErr) {
+          logError('cancellation_email_error', emailErr, requestContext);
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        ...(updateData.refundId && {
+          refundId: updateData.refundId,
+          refundAmount: updateData.refundAmount,
+          stripeFee: updateData.stripeFee,
+          originalCharge: updateData.originalCharge,
+        }),
+      });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
