@@ -7,15 +7,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import heroImg from '@/assets/hero-bg.jpg';
-import galleryInterior from '@/assets/gallery-interior.jpg';
-import galleryTacos from '@/assets/gallery-tacos-platter.jpg';
 import galleryKitchen from '@/assets/gallery-kitchen.jpg';
 import gallerySalsa from '@/assets/gallery-salsa.jpg';
 import foodQuesadilla from '@/assets/quesadila.jpg';
 import foodBurrito from '@/assets/food-burrito.jpg';
 import foodTorta from '@/assets/food-torta.jpg';
 import foodTacos from '@/assets/food-tacos.jpg';
-import menuFeatured from '@/assets/menu-featured.jpg';
 
 const AboutPageContent = () => {
   const { isCartOpen, setIsCartOpen } = useCart();
@@ -210,11 +207,10 @@ const AboutPageContent = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
-              { src: galleryInterior, alt: 'Restaurant Interior', span: 'md:col-span-2 md:row-span-2' },
-              { src: galleryTacos, alt: 'Tacos Platter', span: '' },
+              { src: '/inside.JPEG', alt: 'Inside the Restaurant', span: 'md:col-span-2 md:row-span-2' },
               { src: foodQuesadilla, alt: 'Quesadilla', span: '' },
-              { src: menuFeatured, alt: 'Our Menu Board', span: 'md:col-span-2' },
               { src: foodBurrito, alt: 'Burrito', span: '' },
+              { src: '/front_desk.JPEG', alt: 'Front Desk', span: 'md:col-span-2' },
               { src: gallerySalsa, alt: 'Fresh Salsa & Guacamole', span: '' },
               { src: foodTorta, alt: 'Torta', span: '' },
               { src: foodTacos, alt: 'Street Tacos', span: '' },
