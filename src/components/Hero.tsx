@@ -3,7 +3,6 @@ import { ChevronDown, Star, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import heroBg from '@/assets/hero-bg.jpg';
 
 const Hero = () => {
   const { t } = useLanguage();
@@ -13,12 +12,12 @@ const Hero = () => {
       {/* Background image with overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroBg}
+          src="/landing.jpeg"
           alt="Authentic Mexican tacos"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-warm-brown/90 via-warm-brown/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-warm-brown/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
 
       {/* Decorative elements */}
