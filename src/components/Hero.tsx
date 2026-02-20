@@ -43,8 +43,8 @@ const Hero = () => {
           >
             <div className="flex items-center gap-1 bg-primary/90 text-primary-foreground px-4 py-2 rounded-full text-sm font-medium">
               <Star className="w-4 h-4 fill-current" />
-              <span>4.3</span>
-              <span className="opacity-80">(922 {t('hero.rating')})</span>
+              <span>4.8</span>
+              <span className="opacity-80">(200+ {t('hero.rating')})</span>
             </div>
             <span className="text-warm-cream/80">·</span>
             <span className="text-warm-cream font-medium">$$</span>
