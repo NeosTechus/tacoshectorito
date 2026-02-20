@@ -211,7 +211,6 @@ const AboutPageContent = () => {
               { src: foodQuesadilla, alt: 'Quesadilla', span: '' },
               { src: foodBurrito, alt: 'Burrito', span: '' },
               { src: '/front_desk.JPEG', alt: 'Front Desk', span: 'md:col-span-2' },
-              { src: gallerySalsa, alt: 'Fresh Salsa & Guacamole', span: '' },
               { src: foodTorta, alt: 'Torta', span: '' },
               { src: foodTacos, alt: 'Street Tacos', span: '' },
             ].map((image, index) => (
